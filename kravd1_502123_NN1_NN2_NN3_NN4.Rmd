@@ -322,14 +322,14 @@ table(sum_dice)
 > b) umgera hetta úrslit til eina tibble við at brúka `as_tibble()`. Goym úrslitið í `two_dice`, sum tit síðani lesa út.
 
 ```{r}
-two_dice <- as_tibble(two_dice)
+two_dice <- as_tibble(sum_dice)
 two_dice
 ```
 
 > c) broyt datatypu á tí variablinum, sum inniheldur samanløgdu virðini frá 2 til 12, so hesin verður ein faktor-variabul.
 
 ```{r}
-
+dicefactor <- factor(two_dice)
 ```
 
 > d) ger nú eitt bar-plot yvir útfallsrúmið `two_dice` av samanløgdu tølunum frá tveimum terningum.
