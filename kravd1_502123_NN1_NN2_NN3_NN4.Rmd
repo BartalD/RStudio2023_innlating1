@@ -66,31 +66,14 @@ akfar
 
 > c) hvussu nógvar observatiónir og variablar eru í `akfar`, og hvørjar datatypur hava einstøku variablarnir?
 
-```{r}
-# har eru 192 observatiónir við 3 variablum. Hetta gevur tilsamans 576 observatiónir.
-# Tað rætta svarið er nokk 192 og 3 !!
-#length(as.matrix(akfar))
-```
-```{r}
-count(akfar)
-```
-```{r}
-variable.names(akfar)
-```
-
-```{r}
-sapply(akfar, typeof)
-```
-
+    Har eru 192 observatiónir við 3 variablum. Variablanir ár og tilsamans hava double, ímeðan sýsla brúkar character.
 
 > d) útskriva `akfar` sorteraða eftir `ár`, `tilsamans`, soleiðis at hægsta talið av `tilsamans` stendur ovast fyri hvørt ár, síðani næsthægsta, o.s.v..
 
 ```{r}
-akfar_sort <- akfar %>%
-  as.data.frame() %>%
+akfar %>%
   arrange(desc(tilsamans)) %>%
   arrange(desc(ár))
-akfar_sort
 ```
 
 > e) plotta eitt punkt- og linjuplot av `akfar` við `ár`sum x-aksa og `tilsamans` sum y-aksa. Brúka litir av punktum og linjum, og skap á punktum, til at fáa ein legend fyri `sýsla`, soleiðis at hvør linja hevur sín egna lit og skap av litaðum punktum umboðandi tær 6 sýslurnar. Diskutera kurvarnar, um tú leggur merki til nakað áhugavert.
@@ -98,14 +81,10 @@ akfar_sort
 ```{r}
 ggplot(akfar) +
   geom_point(aes(x = ár, y = tilsamans, colour = sýsla, shape = sýsla)) +
-  theme(axis.text.x = element_text(angle=90))
-```
-```{r}
-ggplot(akfar) +
   geom_line(aes(x = ár, y = tilsamans, colour = sýsla)) +
   theme(axis.text.x = element_text(angle=90))
 ```
-    
+
 > f) plotta eitt punkt- og linju facet-plot av `akfar` við `ár`sum x-aksa og `tilsamans` sum y-aksa. Ikki brúka litir ella ymisk skap av punktum í hesum plotti. Diskutera aftur kurvarnar, um tú leggur merki til nakað áhugavert. Royn til dømis at gera facet-plottið bæði uttan og við at brúka `scales = "free_y"`.
 
 ```{r}
@@ -123,7 +102,7 @@ ggplot(akfar) +
              scales = "free_y")
 ```
 
-
+    Vit síggja at sýslunar á Streymoynni og Eysturoynni hava nógv størri vøkstur enn hinar sýslunar. Men um tú setur `scales = "free_y"`, so sært tú at allar sýslunar hava sama vakstrarmynstur. Eisini sært tú betri hvussu nógv talið er vaksið á t.d. Vágoynni. Uttan `scales = "free_y"`, sært tú næstan ikki kreppunar í 90'unum og 2008, men um tú tendrar tað, so sært tú tað á øllum sýslunum.
 
 ### Uppg. 2
 
@@ -142,40 +121,31 @@ akfar_tils
 ```{r}
 ggplot(akfar_tils) +
   geom_point(aes(x = ár, y = tils_sýslur)) +
-  theme(axis.text.x = element_text(angle=90))
-```
-```{r}
-ggplot(akfar_tils) +
   geom_line(aes(x = ár, y = tils_sýslur)) +
   theme(axis.text.x = element_text(angle=90))
 ```
 
+
 >c) vend aftur til tíni innlisnu data `akfar`, og plotta eitt bar-plot av `akfar` við `ár` sum x-aksa og `tilsamans` sum y-aksa.
 
 ```{r}
-ggplot(data=akfar) +
-  geom_bar(mapping = aes(x = ár,
-                         y = after_stat(prop),
-                         group = 1))
-```
-
-
-```{r}
-ggplot(akfar) +
-  geom_bar(aes(y)) +
-  theme(axis.text.x = element_text(angle=90))
+ggplot(data=akfar, aes(x = ár, y = tilsamans)) +
+  geom_bar(stat='identity')
 ```
 
 >d) plotta aftur eitt bar-plot av `akfar` við `ár` sum x-aksa og `tilsamans` sum y-aksa, har tú eisini mappar fill til `sýsla`, so tú nú fært stáplaðar stabbar fyri hvørt ár við einum liti fyri hvørja sýslu, og ein legend, sum vísir hvør litur svarar til hvørja sýslu.
 
 ```{r}
-
+ggplot(data=akfar, aes(x = ár, y = tilsamans, fill = sýsla)) +
+  geom_bar(stat='identity', fill = 'sýsla')
 ```
 
 >e) plotta aftur eitt bar-plot av `akfar` við `ár` sum x-aksa og `tilsamans` sum y-aksa, har tú aftur mappar fill til `sýsla`, so tú enn fært stáplaðar stabbar fyri hvørt ár við einum liti fyri hvørja sýslu, og ein legend, sum vísir hvør litur svarar til hvørja sýslu. Hesuferð, skal tú harumframt gera eina broyting, so samlaðu stabbarnir allir vera líka høgir, so lutfallið ímillum sýslurnar hvørt árið gerst lættari at samanbera.
 
 
 ```{r}
+ggplot(akfar, aes(x = ár, y = tilsamans, fill = sýsla)) +
+  geom_bar(stat = 'identity', position = 'fill')
 
 ```
 
