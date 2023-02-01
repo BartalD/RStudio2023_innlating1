@@ -170,37 +170,52 @@ ggplot(akfar, aes(x = ár, y = tilsamans)) +
 > a) innles data `elorka.csv` inn í objekt `elorka`, og les úrslitið út. Hetta er El-framleiðslan hjá SEV skift á vatn, vind og termiska orku í MWh (1990-2021). Tey eru heintaði frá heimasíðuni: https://statbank.hagstova.fo/pxweb/fo/H2/H2__UO__UO03/ork_elgerd.px/ (minstu orkukeldurnar eru ikki tiknar við).
 
 ```{r}
-
+# ár, slag, MWh
+elorka <- read.csv2("data/elorka.csv", sep=",")
 ```
 
 > b) plotta eitt punkt- og linjuplot av `elorka` við `ár` sum x-aksa og `MWh` sum y-aksa. Brúka litir av punktum og linjum, og skap á punktum, til at fáa ein legend fyri `slag`, soleiðis at hvør linja hevur sín egna lit og skap av litaðum punktum umboðandi tær 3 stóru orkukeldurnar (slag: Termisk, Vatn og Vindorka), sum vit hava innlisið. Diskutera kurvarnar, um tú leggur merki til nakað áhugavert.
 
 
 ```{r}
-
+ggplot(elorka, aes(ár, MWh, color = slag, shape = slag)) +
+  geom_point() +
+  geom_line()
 ```
+
+    Tað sæst ein øking í øllum trimum, serliga termisku og vindorku. Her sæst at fleiri vindmyllur eru komnar upp seinastu árini.
+    Ein greiður tendensur sæst tó, vit brúka munandi meiri orku nú enn fyri 30 árum síðani, men serliga tey síðstu 5 til 10 árini eru tað lopi avstað. Møguligvís er hetta boomi aftaná fíggjarkreppuni í 2008.
+
 > c) ger ein pipe-setning bólkað uppá `ár`, sum telur saman samlaðu El-framleiðsuna fyri hvørt árið. Goym úrslitið í `elorka_total` og les hana út.
 
 ```{r}
-
+elorka_total <-
+  elorka %>%
+  group_by(ár) %>%
+  summarise(Orka = sum(ifelse(is.na(MWh), 0, MWh)))
+elorka_total
 ```
 
 >d) ger eitt boxplot av `elorka` har tú mappar `slag` til x-aksa og `MWh` til y-aksa.
 
 ```{r}
-
+ggplot(elorka, aes(slag, MWh)) +
+  geom_boxplot()
 ```
 
 >e) legg ein nýggjan variabul `perioda` afturat tibble `elorka`, har tit tildeila trý tíðarskeið ([1990,2000], (2000,2011], (2011,2021]) fyri variabul `ár`. Soleiðis, at hvørt virði av variabul `ár` fær eitt av hesum tíðarskeiðum ásett í variabul `perioda` við brúk av `cut_interval()` funktiónini. Les síðani broyttu `elorka` útaftur og eftirkanna at `perioda` er ein faktor við virðunum (levels): [1990,2000], (2000,2011], (2011,2021]. 
 
 ```{r}
-
+elorka_perioda <- elorka %>% add_column("period" = cut_interval(x=elorka$ár, width=0, n=3, dig.lab=5))
+elorka_perioda
 ```
 
 > f) ger aftur eitt boxplot av `elorka` har tú mappar `slag` til x-aksa og `MWh` til y-aksa. Hesuferð, sum eitt facet-plot eftir variabul `perioda`, soleiðis at tú fært eitt boxplot fyri hvørt virði av `perioda` (tú fært tá trý boxplot). 
 
 ```{r}
-
+ggplot(elorka_perioda, aes(slag, MWh)) +
+  geom_boxplot() +
+  facet_wrap(~period)
 ```
 
 
