@@ -137,7 +137,7 @@ ggplot(data=akfar, aes(x = ár, y = tilsamans)) +
 
 ```{r}
 ggplot(data=akfar, aes(x = ár, y = tilsamans, fill = sýsla)) +
-  geom_bar(stat='identity', fill = 'sýsla')
+  geom_bar(stat='identity')
 ```
 
 >e) plotta aftur eitt bar-plot av `akfar` við `ár` sum x-aksa og `tilsamans` sum y-aksa, har tú aftur mappar fill til `sýsla`, so tú enn fært stáplaðar stabbar fyri hvørt ár við einum liti fyri hvørja sýslu, og ein legend, sum vísir hvør litur svarar til hvørja sýslu. Hesuferð, skal tú harumframt gera eina broyting, so samlaðu stabbarnir allir vera líka høgir, so lutfallið ímillum sýslurnar hvørt árið gerst lættari at samanbera.
@@ -152,11 +152,16 @@ ggplot(akfar, aes(x = ár, y = tilsamans, fill = sýsla)) +
 > f) plotta aftur eitt bar-plot av `akfar` við `ár` sum x-aksa og `tilsamans` sum y-aksa, sum hesuferð er eitt facet-plot eftir variabul `sýsla`. Ikki brúka litir í hesum plotti, men royn og minka um víddina av stabbunum (t.d. width = 0.75). Royn aftur at gera facet-plottið bæði uttan og við at brúka `scales = "free_y"`.
 
 ```{r}
-
+ggplot(akfar, aes(x = ár, y = tilsamans)) +
+  geom_bar(stat = 'identity', width = 0.75) +
+  facet_wrap(~sýsla)
 ```
 
 ```{r}
-
+ggplot(akfar, aes(x = ár, y = tilsamans)) +
+  geom_bar(stat = 'identity', width = 0.75) +
+  facet_wrap(~sýsla,
+             scales = "free_y")
 ```
 
 
@@ -206,48 +211,99 @@ ggplot(akfar, aes(x = ár, y = tilsamans, fill = sýsla)) +
 ```{r}
 mm_colors <- c("Blue", "Orange", "Green", "Yellow", "Red", "Brown")
 mm_probs <- c(0.21, 0.20, 0.20, 0.14, 0.13, 0.12)
-
 ```
 
 > a) simulera sannlíkindini fyri at ein tilvildarliga vald M&M ikki er grøn.
 
 ```{r}
-
+event <- replicate(10000, {
+  bag <- sample(
+    x = mm_colors,
+    prob = mm_probs,
+    size = 1
+  )
+  sum(bag != "Green") == 1
+})
+mean(event)
 ```
 
 > b) simulera sannlíkindini fyri at ein tilvildarliga vald M&M er antin reyð, appelsingul, ella gul
 
 ```{r}
-
+event <- replicate(10000, {
+  bag <- sample(
+    x = mm_colors,
+    prob = mm_probs,
+    size = 1
+  )
+  sum(bag == "Red") == 1 | sum(bag == "Orange") == 1 | sum(bag == "Yellow") == 1
+})
+mean(event)
 ```
 
 > c) simulera sannlíkindini fyri at um tú tekur fýra tilvildarlig M&M's, at tú so fært minst eina bláa.
 
 ```{r}
-
+event <- replicate(10000, {
+  bag <- sample(
+    x = mm_colors,
+    prob = mm_probs,
+    size = 4,
+    replace = TRUE
+  )
+  sum(bag == "Blue") >= 1
+})
+mean(event)
 ```
 
 > d) simulera sannlíkindini fyri at um tú tekur seks tilvildarlig M&M's, at tú so fært eina av hvørjum liti.
 
 ```{r}
-
+event <- replicate(10000, {
+  bag <- sample(
+    x = mm_colors,
+    prob = mm_probs,
+    size = 6,
+    replace = TRUE
+  )
+  sum(bag == "Blue") == 1 & sum(bag == "Yellow") == 1 & sum(bag == "Red") == 1 & sum(bag == "Orange") == 1 & sum(bag == "Green") == 1 & sum(bag == "Brown") == 1
+})
+mean(event)
 ```
 
 > e) simulera sannlíkindini fyri at um tú tekur 30 tilvildarlig M&M's, at tú so fært minst 9 bláar og minst 6 appelsingular.
 
 ```{r}
-
+event <- replicate(10000, {
+  bag <- sample(
+    x = mm_colors,
+    prob = mm_probs,
+    size = 30,
+    replace = TRUE
+  )
+  sum(bag == "Blue") >= 9 & sum(bag == "Orange") >= 6
+})
+mean(event)
 ```
 
 > f) givið fýra blóðtypur og teirra sannlíkindir í dømi 2.9, útrokna teoretiskt og/ella simulera sannlíkindini fyri at tvey tilvildarlig vald fólk hava somu blóðtypu. Um tit gera bæði, so samanber teoretiskt og simulerað úrslit.
 
 ```{r}
-
+bloodtypes <- c("O", "A", "B", "AB")
+bloodprobs <- c(0.45, 0.40, 0.11, 0.04)
 ```
 
 ```{r}
-
-
+event <- replicate(10000, {
+  bag <- sample(
+    x = bloodtypes,
+    prob = bloodprobs,
+    size = 2,
+    replace = TRUE
+  )
+  anyDuplicated(bag) > 0
+})
+mean(event)
 ```
 
 
@@ -256,13 +312,18 @@ mm_probs <- c(0.21, 0.20, 0.20, 0.14, 0.13, 0.12)
 > a) simulera at kasta tveir terningar og at leggja virði teirra saman. Brúka 10000 endurtøkur og goym samanløgdu virðini í `sum_dice`. Ger síðani eitt `table(sum_dice)`, sum vísir hvussu nógv virðir tú hevur fingið av hvørjum møguligum virði. 
 
 ```{r}
-
+sum_dice <- replicate(10000, {
+  dieRoll <- sample(1:6, 2, replace = TRUE)
+  sum(dieRoll)
+})
+table(sum_dice)
 ```
 
 > b) umgera hetta úrslit til eina tibble við at brúka `as_tibble()`. Goym úrslitið í `two_dice`, sum tit síðani lesa út.
 
 ```{r}
-
+two_dice <- as_tibble(two_dice)
+two_dice
 ```
 
 > c) broyt datatypu á tí variablinum, sum inniheldur samanløgdu virðini frá 2 til 12, so hesin verður ein faktor-variabul.
