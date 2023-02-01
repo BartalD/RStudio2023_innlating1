@@ -1,0 +1,322 @@
+---
+title: "Kravd innlating 1"
+author: "Skriva fult navn/nøvn á lesandi her."
+date: "Innlating í Moodle: seinast um kvøldið 7. februar 2023. Endurbrúka eisini fílnavnið á hesum template-skjalinum, sum tit lata inn, har tit seta tykkara forbókstavir inn fyri NN1_NN2_NN3_NN4."
+output: html_notebook
+---
+
+## Dátuvísindi og hagfrøði við RStudio
+
+### Innleiðing
+
+> Hendan innlating skal skal gerast í RStudio við brúk av R Markdown. Hetta soleiðis, at tú brúkar hugtøkini, sum vit hava lært innan endurskapandi gransking (reproducible research) við RStudio, har tú bindur tín tekst, R-kodu og úrslit saman í eitt html_notebook skjal, sum tú síðani letur inn. 
+>
+> Hevur tú trupulleikar við at fáa R Markdown at virka, ella bert vilt skilja R Markdown betur, so les meira um evnið í _R for Data Science_ lærubókini (__27__ R Markdown og __29__ R Markdown formats).
+>
+> Henda innlatingin er einamest um innlesing, greining og plot av data við brúk av `tidyverse` hentleikum, sum tit hava lært í _R for Data Science_ lærubókini, umframt uppgávur innan sannlíkindi, sum tit hava lært um úr bókini _Probability, Statistics and Data_.
+
+> Arbeiðið saman - helst bólkar á fýra lesandi - tó undantøk kunna gerast. Tað er sera umráðandi, at hvør einstaklingur í bólkinum er væl við og ger sín part av arbeiðinum. Innlatingin skal vera testað og virka á teldunum hjá hvørjum einstøkum limi í bólkinum.
+
+> Tú/tit opna hetta skjal í RStudio, sum ein template til innlatingina, og skriva tykkara R-kodu í teir givnu, men tómu kodublokkarnar.
+
+> Teir spurningar, sum tit skula svara við vanligum teksti ella tølum, skula tit gera við at svara beint undir hvørjum slíkum spurningi, á linju tit byrja við 4 blonkum teknum. Hetta ger at tykkara svar verður innrammað í eini boks, og soleiðis brýtur frá tekstinum í uppgávuni.
+
+    Svara tekstspurningum á hendan hátt, beint undir hvørjum slíkum spurningi.
+
+> Tá tit eru liðug, ger hvør bólkur eitt endaligt "Run All" og síðani "Preview", sum kann opnast í browsara (og RStudio), og lata inn skjalið: "kravd1_5021_NN1_NN2_NN3_NN4.nb.html".
+
+### Pakkar
+
+> Loada pakka `tidyverse`. 
+
+```{r}
+#install.packages("tidyverse")
+```
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+options(dplyr.summarise.inform = FALSE)
+library(tidyverse)
+
+
+# set theme used for plotting
+theme_set(theme_bw(base_size = 12))
+
+```
+
+
+### Uppg. 1
+
+> a) innles data `akfar.csv` inn í objekt `akfar` eins og tú gjørdi í venjingini við bildata. Hetta eru skrásett motorakfør fyri hvørja sýslu í Føroyum og fyri hvørt ár síðani 1980. Tey eru heintaði frá heimasíðuni: https://hagstova.fo/fo/umhvorvi/samferdsla/motorakfor
+
+```{r }
+
+akfar <- read_csv("data/akfar.csv")
+
+```
+
+> b) útskriva `akfar` á einfaldasta hátt, sum tú kanst gera.
+
+```{r}
+akfar
+```
+
+> c) hvussu nógvar observatiónir og variablar eru í `akfar`, og hvørjar datatypur hava einstøku variablarnir?
+
+```{r}
+# har eru 192 observatiónir við 3 variablum. Hetta gevur tilsamans 576 observatiónir.
+# Tað rætta svarið er nokk 192 og 3 !!
+#length(as.matrix(akfar))
+```
+```{r}
+count(akfar)
+```
+```{r}
+variable.names(akfar)
+```
+
+```{r}
+sapply(akfar, typeof)
+```
+
+
+> d) útskriva `akfar` sorteraða eftir `ár`, `tilsamans`, soleiðis at hægsta talið av `tilsamans` stendur ovast fyri hvørt ár, síðani næsthægsta, o.s.v..
+
+```{r}
+akfar_sort <- akfar %>%
+  as.data.frame() %>%
+  arrange(desc(tilsamans)) %>%
+  arrange(desc(ár))
+akfar_sort
+```
+
+> e) plotta eitt punkt- og linjuplot av `akfar` við `ár`sum x-aksa og `tilsamans` sum y-aksa. Brúka litir av punktum og linjum, og skap á punktum, til at fáa ein legend fyri `sýsla`, soleiðis at hvør linja hevur sín egna lit og skap av litaðum punktum umboðandi tær 6 sýslurnar. Diskutera kurvarnar, um tú leggur merki til nakað áhugavert.
+
+```{r}
+ggplot(akfar) +
+  geom_point(aes(x = ár, y = tilsamans, colour = sýsla, shape = sýsla)) +
+  theme(axis.text.x = element_text(angle=90))
+```
+```{r}
+ggplot(akfar) +
+  geom_line(aes(x = ár, y = tilsamans, colour = sýsla)) +
+  theme(axis.text.x = element_text(angle=90))
+```
+    
+> f) plotta eitt punkt- og linju facet-plot av `akfar` við `ár`sum x-aksa og `tilsamans` sum y-aksa. Ikki brúka litir ella ymisk skap av punktum í hesum plotti. Diskutera aftur kurvarnar, um tú leggur merki til nakað áhugavert. Royn til dømis at gera facet-plottið bæði uttan og við at brúka `scales = "free_y"`.
+
+```{r}
+ggplot(akfar) +
+  geom_point(aes(x = ár, y = tilsamans)) +
+  theme(axis.text.x = element_text(angle = 90)) +
+  facet_wrap(~ sýsla)
+```
+
+```{r}
+ggplot(akfar) +
+  geom_point(aes(x = ár, y = tilsamans)) +
+  theme(axis.text.x = element_text(angle = 90)) +
+  facet_wrap(~ sýsla,
+             scales = "free_y")
+```
+
+
+
+### Uppg. 2
+
+> a) ger ein pipe-setning av `akfar` bólkað uppá `ár`, sum fyri hvørt ár telur upp talið av sýslum `n_sýslur` og leggur skrásett akfør saman fyri allar sýslur í `tils_sýslur`, goym úrslitið í tibble `akfar_tils` og vís úrslitið (les tína tibble út, sum skal hava 32 rekkjur og 3 kolonnur).
+
+```{r}
+akfar_tils <- akfar %>%
+  group_by(ár, sýsla) %>%
+  summarise(n_sýslur = sum(tilsamans)) %>%
+  summarise(tils_sýslur = sum(n_sýslur))
+akfar_tils
+```
+
+> b) plotta eitt punkt- og linjuplot av `akfar_tils` við `ár` sum x-aksa og `tils_sýslur` sum y-aksa.
+
+```{r}
+ggplot(akfar_tils) +
+  geom_point(aes(x = ár, y = tils_sýslur)) +
+  theme(axis.text.x = element_text(angle=90))
+```
+```{r}
+ggplot(akfar_tils) +
+  geom_line(aes(x = ár, y = tils_sýslur)) +
+  theme(axis.text.x = element_text(angle=90))
+```
+
+>c) vend aftur til tíni innlisnu data `akfar`, og plotta eitt bar-plot av `akfar` við `ár` sum x-aksa og `tilsamans` sum y-aksa.
+
+```{r}
+ggplot(data=akfar) +
+  geom_bar(mapping = aes(x = ár,
+                         y = after_stat(prop),
+                         group = 1))
+```
+
+
+```{r}
+ggplot(akfar) +
+  geom_bar(aes(y)) +
+  theme(axis.text.x = element_text(angle=90))
+```
+
+>d) plotta aftur eitt bar-plot av `akfar` við `ár` sum x-aksa og `tilsamans` sum y-aksa, har tú eisini mappar fill til `sýsla`, so tú nú fært stáplaðar stabbar fyri hvørt ár við einum liti fyri hvørja sýslu, og ein legend, sum vísir hvør litur svarar til hvørja sýslu.
+
+```{r}
+
+```
+
+>e) plotta aftur eitt bar-plot av `akfar` við `ár` sum x-aksa og `tilsamans` sum y-aksa, har tú aftur mappar fill til `sýsla`, so tú enn fært stáplaðar stabbar fyri hvørt ár við einum liti fyri hvørja sýslu, og ein legend, sum vísir hvør litur svarar til hvørja sýslu. Hesuferð, skal tú harumframt gera eina broyting, so samlaðu stabbarnir allir vera líka høgir, so lutfallið ímillum sýslurnar hvørt árið gerst lættari at samanbera.
+
+
+```{r}
+
+```
+
+> f) plotta aftur eitt bar-plot av `akfar` við `ár` sum x-aksa og `tilsamans` sum y-aksa, sum hesuferð er eitt facet-plot eftir variabul `sýsla`. Ikki brúka litir í hesum plotti, men royn og minka um víddina av stabbunum (t.d. width = 0.75). Royn aftur at gera facet-plottið bæði uttan og við at brúka `scales = "free_y"`.
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
+### Uppg. 3
+
+> a) innles data `elorka.csv` inn í objekt `elorka`, og les úrslitið út. Hetta er El-framleiðslan hjá SEV skift á vatn, vind og termiska orku í MWh (1990-2021). Tey eru heintaði frá heimasíðuni: https://statbank.hagstova.fo/pxweb/fo/H2/H2__UO__UO03/ork_elgerd.px/ (minstu orkukeldurnar eru ikki tiknar við).
+
+```{r}
+
+```
+
+> b) plotta eitt punkt- og linjuplot av `elorka` við `ár` sum x-aksa og `MWh` sum y-aksa. Brúka litir av punktum og linjum, og skap á punktum, til at fáa ein legend fyri `slag`, soleiðis at hvør linja hevur sín egna lit og skap av litaðum punktum umboðandi tær 3 stóru orkukeldurnar (slag: Termisk, Vatn og Vindorka), sum vit hava innlisið. Diskutera kurvarnar, um tú leggur merki til nakað áhugavert.
+
+
+```{r}
+
+```
+> c) ger ein pipe-setning bólkað uppá `ár`, sum telur saman samlaðu El-framleiðsuna fyri hvørt árið. Goym úrslitið í `elorka_total` og les hana út.
+
+```{r}
+
+```
+
+>d) ger eitt boxplot av `elorka` har tú mappar `slag` til x-aksa og `MWh` til y-aksa.
+
+```{r}
+
+```
+
+>e) legg ein nýggjan variabul `perioda` afturat tibble `elorka`, har tit tildeila trý tíðarskeið ([1990,2000], (2000,2011], (2011,2021]) fyri variabul `ár`. Soleiðis, at hvørt virði av variabul `ár` fær eitt av hesum tíðarskeiðum ásett í variabul `perioda` við brúk av `cut_interval()` funktiónini. Les síðani broyttu `elorka` útaftur og eftirkanna at `perioda` er ein faktor við virðunum (levels): [1990,2000], (2000,2011], (2011,2021]. 
+
+```{r}
+
+```
+
+> f) ger aftur eitt boxplot av `elorka` har tú mappar `slag` til x-aksa og `MWh` til y-aksa. Hesuferð, sum eitt facet-plot eftir variabul `perioda`, soleiðis at tú fært eitt boxplot fyri hvørt virði av `perioda` (tú fært tá trý boxplot). 
+
+```{r}
+
+```
+
+
+### Uppg. 4
+
+>  Givið, at litirnir og sannlíkindini fyri hvønn lit av M&M eru, sum í fylgjandi kodublokki.
+
+```{r}
+mm_colors <- c("Blue", "Orange", "Green", "Yellow", "Red", "Brown")
+mm_probs <- c(0.21, 0.20, 0.20, 0.14, 0.13, 0.12)
+
+```
+
+> a) simulera sannlíkindini fyri at ein tilvildarliga vald M&M ikki er grøn.
+
+```{r}
+
+```
+
+> b) simulera sannlíkindini fyri at ein tilvildarliga vald M&M er antin reyð, appelsingul, ella gul
+
+```{r}
+
+```
+
+> c) simulera sannlíkindini fyri at um tú tekur fýra tilvildarlig M&M's, at tú so fært minst eina bláa.
+
+```{r}
+
+```
+
+> d) simulera sannlíkindini fyri at um tú tekur seks tilvildarlig M&M's, at tú so fært eina av hvørjum liti.
+
+```{r}
+
+```
+
+> e) simulera sannlíkindini fyri at um tú tekur 30 tilvildarlig M&M's, at tú so fært minst 9 bláar og minst 6 appelsingular.
+
+```{r}
+
+```
+
+> f) givið fýra blóðtypur og teirra sannlíkindir í dømi 2.9, útrokna teoretiskt og/ella simulera sannlíkindini fyri at tvey tilvildarlig vald fólk hava somu blóðtypu. Um tit gera bæði, so samanber teoretiskt og simulerað úrslit.
+
+```{r}
+
+```
+
+```{r}
+
+
+```
+
+
+### Uppg. 5
+
+> a) simulera at kasta tveir terningar og at leggja virði teirra saman. Brúka 10000 endurtøkur og goym samanløgdu virðini í `sum_dice`. Ger síðani eitt `table(sum_dice)`, sum vísir hvussu nógv virðir tú hevur fingið av hvørjum møguligum virði. 
+
+```{r}
+
+```
+
+> b) umgera hetta úrslit til eina tibble við at brúka `as_tibble()`. Goym úrslitið í `two_dice`, sum tit síðani lesa út.
+
+```{r}
+
+```
+
+> c) broyt datatypu á tí variablinum, sum inniheldur samanløgdu virðini frá 2 til 12, so hesin verður ein faktor-variabul.
+
+```{r}
+
+```
+
+> d) ger nú eitt bar-plot yvir útfallsrúmið `two_dice` av samanløgdu tølunum frá tveimum terningum.
+
+
+```{r}
+
+```
+
+> e) ger aftur eitt bar-plot yvir útfallsrúmið `two_dice` av samanløgdu tølunum frá tveimum terningum, har tú nú vísir sannlíkindir, ístaðin fyri antal eftir y-aksanum.
+
+```{r}
+
+```
+
+> f) broyt talvu `two_dice`, so tú goymir sannlíkindini í einum nýggjum variablul `p_sum`, og ger samstundis eisini eina kummultativa sum `cumsum` av `p_sum`, sum tú goymir í nýggjum variabul `c_sum`. Les broyttu talvuna útaftur. Hvat er tað størsta virði tú fært av `c_sum` og forklára tað virðið.
+
+```{r}
+
+```
+
