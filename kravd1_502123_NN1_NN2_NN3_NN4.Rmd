@@ -344,25 +344,33 @@ two_dice
 > c) broyt datatypu á tí variablinum, sum inniheldur samanløgdu virðini frá 2 til 12, so hesin verður ein faktor-variabul.
 
 ```{r}
-dicefactor <- factor(two_dice)
+dice_factor <- as.factor(table(sum_dice))
+dice_factor
 ```
 
 > d) ger nú eitt bar-plot yvir útfallsrúmið `two_dice` av samanløgdu tølunum frá tveimum terningum.
 
 
 ```{r}
-
+ggplot(two_dice, aes(x = value)) +
+  geom_bar()
 ```
 
 > e) ger aftur eitt bar-plot yvir útfallsrúmið `two_dice` av samanløgdu tølunum frá tveimum terningum, har tú nú vísir sannlíkindir, ístaðin fyri antal eftir y-aksanum.
 
 ```{r}
-
+ggplot(two_dice, aes(x = value, y = after_stat(prop))) +
+  geom_bar(width = 0.75)
 ```
 
 > f) broyt talvu `two_dice`, so tú goymir sannlíkindini í einum nýggjum variablul `p_sum`, og ger samstundis eisini eina kummultativa sum `cumsum` av `p_sum`, sum tú goymir í nýggjum variabul `c_sum`. Les broyttu talvuna útaftur. Hvat er tað størsta virði tú fært av `c_sum` og forklára tað virðið.
 
 ```{r}
-
+p_sum <- prop.table(table(two_dice))
+c_sum <- cumsum(p_sum)
+c_sum
 ```
 
+    Stórsta virði er 1. Hetta kemur av einari summering av øllum sannlíkindunum frá 2 til 12. Av tí at sannlíkindi altíð er eitt virði ímillum 0 og 1, so er summeringin av øllum sannlíkindunum altíð 1.
+    
+    
