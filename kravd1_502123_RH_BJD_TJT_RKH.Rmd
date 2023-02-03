@@ -211,9 +211,6 @@ ggplot(elorka, aes(slag, MWh)) +
 >e) legg ein nýggjan variabul `perioda` afturat tibble `elorka`, har tit tildeila trý tíðarskeið ([1990,2000], (2000,2011], (2011,2021]) fyri variabul `ár`. Soleiðis, at hvørt virði av variabul `ár` fær eitt av hesum tíðarskeiðum ásett í variabul `perioda` við brúk av `cut_interval()` funktiónini. Les síðani broyttu `elorka` útaftur og eftirkanna at `perioda` er ein faktor við virðunum (levels): [1990,2000], (2000,2011], (2011,2021]. 
 
 ```{r}
-#elorka_perioda <- elorka %>%
-#  add_column("period" = cut(x=elorka$ár, breaks = c(1990, 2000, 2011, 2021), dig.lab=4, left=FALSE, include.lowest = TRUE))
-#elorka_perioda
 elorka_perioda <- elorka %>% 
   add_column("period" = cut_interval(x=elorka$ár, n=3, dig.lab=4, closed=right))
 elorka_perioda
