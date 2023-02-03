@@ -1,8 +1,13 @@
 ---
 title: "Kravd innlating 1"
-author: "Skriva fult navn/nøvn á lesandi her."
-date: "Innlating í Moodle: seinast um kvøldið 7. februar 2023. Endurbrúka eisini fílnavnið á hesum template-skjalinum, sum tit lata inn, har tit seta tykkara forbókstavir inn fyri NN1_NN2_NN3_NN4."
-output: html_notebook
+author: Rasmus Hansen, Bartal Jógvansson Djurhuus, Torkil Janusarson Thomsen, Rúni
+  Klein Hansen
+date: "Innlating í Moodle: seinast um kvøldið 7. februar 2023. Endurbrúka eisini fílnavnið
+  á hesum template-skjalinum, sum tit lata inn, har tit seta tykkara forbókstavir
+  inn fyri RH_BJD_TJT_RKH."
+output:
+  html_document:
+    df_print: paged
 ---
 
 ## Dátuvísindi og hagfrøði við RStudio
@@ -111,8 +116,8 @@ ggplot(akfar) +
 ```{r}
 akfar_tils <- akfar %>%
   group_by(ár, sýsla) %>%
-  summarise(n_sýslur = sum(tilsamans)) %>%
-  summarise(tils_sýslur = sum(n_sýslur))
+  summarise(n_sýslur = sum(tilsamans), sýsla_teljing = n_distinct(sýsla)) %>%
+  summarise(tils_sýslur = sum(n_sýslur), sýslur = length(sýsla_teljing)) #%>%
 akfar_tils
 ```
 
@@ -206,7 +211,11 @@ ggplot(elorka, aes(slag, MWh)) +
 >e) legg ein nýggjan variabul `perioda` afturat tibble `elorka`, har tit tildeila trý tíðarskeið ([1990,2000], (2000,2011], (2011,2021]) fyri variabul `ár`. Soleiðis, at hvørt virði av variabul `ár` fær eitt av hesum tíðarskeiðum ásett í variabul `perioda` við brúk av `cut_interval()` funktiónini. Les síðani broyttu `elorka` útaftur og eftirkanna at `perioda` er ein faktor við virðunum (levels): [1990,2000], (2000,2011], (2011,2021]. 
 
 ```{r}
-elorka_perioda <- elorka %>% add_column("period" = cut_interval(x=elorka$ár, width=0, n=3, dig.lab=5))
+#elorka_perioda <- elorka %>%
+#  add_column("period" = cut(x=elorka$ár, breaks = c(1990, 2000, 2011, 2021), dig.lab=4, left=FALSE, include.lowest = TRUE))
+#elorka_perioda
+elorka_perioda <- elorka %>% 
+  add_column("period" = cut_interval(x=elorka$ár, n=3, dig.lab=4, closed=right))
 elorka_perioda
 ```
 
@@ -281,7 +290,12 @@ event <- replicate(10000, {
     size = 6,
     replace = TRUE
   )
-  sum(bag == "Blue") == 1 & sum(bag == "Yellow") == 1 & sum(bag == "Red") == 1 & sum(bag == "Orange") == 1 & sum(bag == "Green") == 1 & sum(bag == "Brown") == 1
+  sum(bag == "Blue")     == 1 &
+    sum(bag == "Yellow") == 1 &
+    sum(bag == "Red")    == 1 &
+    sum(bag == "Orange") == 1 &
+    sum(bag == "Green")  == 1 &
+    sum(bag == "Brown")  == 1
 })
 mean(event)
 ```
@@ -310,13 +324,13 @@ bloodprobs <- c(0.45, 0.40, 0.11, 0.04)
 
 ```{r}
 event <- replicate(10000, {
-  bag <- sample(
+  group <- sample(
     x = bloodtypes,
     prob = bloodprobs,
     size = 2,
     replace = TRUE
   )
-  anyDuplicated(bag) > 0
+  anyDuplicated(group) > 0
 })
 mean(event)
 ```
@@ -367,8 +381,9 @@ ggplot(two_dice, aes(x = value, y = after_stat(prop))) +
 
 ```{r}
 p_sum <- prop.table(table(two_dice))
-c_sum <- cumsum(p_sum)
+c_sum <- as_tibble(cumsum(p_sum))
 c_sum
+arrange(c_sum, desc(value))
 ```
 
     Stórsta virði er 1. Hetta kemur av einari summering av øllum sannlíkindunum frá 2 til 12. Av tí at sannlíkindi altíð er eitt virði ímillum 0 og 1, so er summeringin av øllum sannlíkindunum altíð 1.
