@@ -60,7 +60,6 @@ theme_set(theme_bw(base_size = 12))
 ```{r }
 
 akfar <- read_csv("data/akfar.csv")
-
 ```
 
 > b) útskriva `akfar` á einfaldasta hátt, sum tú kanst gera.
@@ -95,6 +94,7 @@ ggplot(akfar) +
 ```{r}
 ggplot(akfar) +
   geom_point(aes(x = ár, y = tilsamans)) +
+  geom_line(aes(x = ár, y = tilsamans)) +
   theme(axis.text.x = element_text(angle = 90)) +
   facet_wrap(~ sýsla)
 ```
@@ -102,6 +102,7 @@ ggplot(akfar) +
 ```{r}
 ggplot(akfar) +
   geom_point(aes(x = ár, y = tilsamans)) +
+  geom_line(aes(x = ár, y = tilsamans)) +
   theme(axis.text.x = element_text(angle = 90)) +
   facet_wrap(~ sýsla,
              scales = "free_y")
@@ -176,7 +177,7 @@ ggplot(akfar, aes(x = ár, y = tilsamans)) +
 
 ```{r}
 # ár, slag, MWh
-elorka <- read.csv2("data/elorka.csv", sep=",")
+elorka <- read_csv("data/elorka.csv")
 ```
 
 > b) plotta eitt punkt- og linjuplot av `elorka` við `ár` sum x-aksa og `MWh` sum y-aksa. Brúka litir av punktum og linjum, og skap á punktum, til at fáa ein legend fyri `slag`, soleiðis at hvør linja hevur sín egna lit og skap av litaðum punktum umboðandi tær 3 stóru orkukeldurnar (slag: Termisk, Vatn og Vindorka), sum vit hava innlisið. Diskutera kurvarnar, um tú leggur merki til nakað áhugavert.
